@@ -1,0 +1,6 @@
+name: 1-TheBeginning-main
+source: daml
+version: 0.0.1
+dependencies:
+  - daml-prim
+  - daml-stdlib

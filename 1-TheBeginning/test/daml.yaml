@@ -1,0 +1,10 @@
+sdk-version: 3.5.3
+name: 1-TheBeginning-test
+source: daml
+version: 0.0.1
+dependencies:
+  - daml-prim
+  - daml-stdlib
+  - daml-script
+data-dependencies:
+  - ../main/.daml/dist/1-TheBeginning-main-0.0.1.dar
