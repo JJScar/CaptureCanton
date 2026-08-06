@@ -1,0 +1,9 @@
+# Daml build artifacts (matches at any depth, since every challenge/common
+# package has its own main/test subfolders)
+.daml/
+dist/
+*.dar
+log/
+
+# OS
+.DS_Store

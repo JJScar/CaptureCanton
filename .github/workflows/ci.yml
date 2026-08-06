@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Collect required SDK versions
+        id: sdk
+        run: |
+          versions=$(grep -rhoP '^sdk-version:\s*\K\S+' --include='*.yaml' . | sort -u)
+          echo "Found SDK versions:"
+          echo "$versions"
+          {
+            echo "versions<<EOF"
+            echo "$versions"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Cache Daml SDK installs
+        uses: actions/cache@v4
+        with:
+          path: ~/.daml
+          key: daml-sdk-${{ runner.os }}-${{ hashFiles('**/daml.yaml', '**/multi-package.yaml') }}
+
+      - name: Install Daml assistant
+        run: |
+          curl -sSL https://get.daml.com/ | sh
+          echo "$HOME/.daml/bin" >> "$GITHUB_PATH"
+
+      - name: Install required SDK versions
+        run: |
+          while IFS= read -r v; do
+            [ -z "$v" ] && continue
+            daml install "$v"
+          done <<< "${{ steps.sdk.outputs.versions }}"
+
+      - name: Build and test every package group
+        run: |
+          set -euo pipefail
+          while IFS= read -r -d '' mp; do
+            group_dir=$(dirname "$mp")
+            echo "::group::daml build --all ($group_dir)"
+            (cd "$group_dir" && daml build --all)
+            echo "::endgroup::"
+
+            while IFS= read -r -d '' dy; do
+              pkg_dir=$(dirname "$dy")
+              if grep -qE '^\s*-\s*daml-script\s*$' "$dy"; then
+                echo "::group::daml test ($pkg_dir)"
+                (cd "$pkg_dir" && daml test)
+                echo "::endgroup::"
+              fi
+            done < <(find "$group_dir" -name daml.yaml -print0)
+          done < <(find . -name multi-package.yaml -not -path './.git/*' -print0)
