@@ -14,7 +14,7 @@ To check whether you're able to pull it off, enter your solution in the `1-TheBe
 
 ```haskell
 -- ENTER SOLUTION BELOW --
-    
+-> Enter HERE!
 -- ENTER SOLUTION ABOVE --
 ```
 
