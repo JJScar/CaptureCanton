@@ -1,0 +1,25 @@
+module Iou_Asset_Test where
+
+import Iou_Asset
+import Daml.Script
+
+-- DISCLAIMER: DO NOT CHANGE ANYTHING BUT THE AREA SPECIFIED TO GET THE CORRECT SOLUTION!
+testSolution : Script ()
+testSolution = do
+    -- Setting up parties:
+    issuer <- allocateParty "Issuer"
+    auditor <- allocateParty "Auditor"
+    alice <- allocateParty "Alice"
+
+    -- Setting up the asset contract (issuing the asset):
+    iouAssetId <- submit (actAs [issuer, alice]) do
+        createCmd Iou_Asset with issuer = issuer; owner = alice; auditor = auditor; amount = 100.0
+
+    -- ENTER SOLUTION BELOW --
+    
+    -- ENTER SOLUTION ABOVE --
+
+    iouAssets <- query @Iou_Asset auditor
+    assert (any (\(_, asset) -> asset.owner == auditor) iouAssets) 
+
+    pure()

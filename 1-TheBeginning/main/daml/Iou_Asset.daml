@@ -1,0 +1,19 @@
+module Iou_Asset where
+
+template Iou_Asset 
+    with
+        issuer : Party
+        owner : Party
+        auditor : Party
+        amount : Decimal
+    where
+        ensure amount > 0.0 
+        signatory issuer, owner 
+        observer auditor
+
+        choice Iou_Asset_Transfer : ContractId Iou_Asset 
+            with
+                newOwner : Party
+                currentOwner : Party
+            controller currentOwner
+                do create this with owner = newOwner

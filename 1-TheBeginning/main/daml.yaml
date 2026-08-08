@@ -1,4 +1,5 @@
-name: 1-TheBeginning-main
+sdk-version: 3.4.11
+name: TheBeginning-main
 source: daml
 version: 0.0.1
 dependencies:
