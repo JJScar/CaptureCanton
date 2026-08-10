@@ -7,3 +7,6 @@ log/
 
 # OS
 .DS_Store
+
+# Local-only notes, not for the repo
+CLAUDE_CONTEXT.md
