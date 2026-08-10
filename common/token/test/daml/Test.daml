@@ -13,16 +13,21 @@ setup = script do
   bobId <- validateUserId "bob"
   createUser (User aliceId (Some alice)) [CanActAs alice]
   createUser (User bobId (Some bob)) [CanActAs bob]
+  auditor <- allocatePartyByHint (PartyIdHint "Auditor")
+  issuer <- allocatePartyByHint (PartyIdHint "Issuer")
+  let amountToIssue = 1000.0 : Decimal
 -- user_setup_end
 
-  aliceTV <- submit alice do
+  aliceTV <- submit issuer do
     createCmd Asset with
-      issuer = alice
+      issuer = issuer
       owner = alice
-      name = "TV"
+      currency = "CapCan"
+      amount = amountToIssue
+      auditors = [auditor]
 
   bobTV <- submit alice do
-    exerciseCmd aliceTV Give with newOwner = bob
+    exerciseCmd aliceTV Transfer with newOwner = bob
 
   submit bob do
-    exerciseCmd bobTV Give with newOwner = alice
+    exerciseCmd bobTV Transfer with newOwner = alice
