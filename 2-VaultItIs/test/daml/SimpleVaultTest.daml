@@ -1,0 +1,24 @@
+module SimpleVaultTest where
+
+import SimpleVault
+import Daml.Script
+
+testSimpleVault : Script ()
+testSimpleVault = do
+    -- Setting up actors
+    custodian <- allocateParty "custodian"
+    alice <- allocateParty "alice"
+    bob <- allocateParty "bob"
+    auditor <- allocateParty "auditor"
+    let amountAliceDeposits = 1000.0 : Decimal
+
+    -- creating alice's vault
+    aliceSimpleVaultId <- submit (actAs [custodian, alice]) do
+        createCmd SimpleVault with custodian = custodian; user = alice; trustedDepositors = [bob]; amountDeposited = amountAliceDeposits
+    
+    -- ENTER SOLUTION BELOW --
+    
+    -- ENTER SOLUTION ABOVE --
+
+    aliceVaults <- query @SimpleVault alice 
+    assert (any (\(_, vault) -> vault.amountDeposited == 0.1) aliceVaults)

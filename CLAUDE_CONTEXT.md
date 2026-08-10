@@ -1,0 +1,3 @@
+This repo is meant to be a series of Canton (written in Daml) challenges, similar to Damn Vulnerable DeFi to Ethereum. However, as Canton has private work flows we focus on perhaps different things like ensuring the authrised roles are in good design and that the data is kept correctly. 
+
+Now: I need your help to come up with an interesting bug to insert in challenge 2 (`2-VaultItIs/main/daml/SimpleVault.daml`). I don't want another bug that is similar to the one in challenge one (`1-TheBeginning/main/daml/Iou_Asset.daml`) where we allow the auditor to pass themselves as the user as they are an observer. As this is only the second challenge, I still don't want it to be too hard (as the contract is pretty simple). 

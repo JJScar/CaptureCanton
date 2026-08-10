@@ -1,0 +1,42 @@
+module SimpleVault where
+
+template SimpleVault
+  with
+    custodian : Party
+    user : Party
+    trustedDepositors : [Party]
+    amountDeposited : Decimal 
+  where
+    ensure amountDeposited > 0.0
+    signatory custodian, user
+    observer trustedDepositors
+
+    choice Deposit : ContractId SimpleVault 
+      with
+        depositAmount : Decimal
+        depositor : Party
+      controller depositor
+        do 
+          assert (depositor == user || depositor `elem` trustedDepositors )
+          assert (depositAmount > 0.0)
+          create this with amountDeposited = amountDeposited + depositAmount
+
+    choice Withdraw : ContractId SimpleVault 
+      with
+        withdrawAmount : Decimal
+        withdrawer : Party
+      controller withdrawer
+        do
+          assert (withdrawer == user || withdrawer `elem` trustedDepositors )
+          assert (withdrawAmount > 0.0 && withdrawAmount <= amountDeposited)
+          create this with amountDeposited = amountDeposited - withdrawAmount
+    
+    choice Add_Depositor : ContractId SimpleVault 
+      with
+       trustedDepositorsToAdd : [Party]
+       authorisedCaller : Party
+     controller authorisedCaller
+        do
+          assert (authorisedCaller == user || authorisedCaller == custodian)
+          create this with trustedDepositors = trustedDepositors ++ trustedDepositorsToAdd
+          
