@@ -1,0 +1,11 @@
+module AtomicSwap where
+
+import Token
+
+template AtomicSwap
+  with
+    partyA : Party
+
+    partyB : Party
+  where
+    signatory party, partyB

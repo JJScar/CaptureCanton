@@ -1,0 +1,51 @@
+module Token where
+
+-- A simple token that can be transferred, split from, merged into and add obserevers when needed. 
+
+type TokenId = ContractId Token
+
+template Token
+  with
+    issuer : Party
+    owner  : Party
+    currency   : Text
+    amount : Decimal
+    auditors : [Party]
+  where
+    ensure currency /= "" && amount > 0.0
+    signatory issuer
+    observer owner, auditors
+
+    choice Transfer : TokenId
+      with newOwner : Party
+      controller owner
+      do create this with
+           owner = newOwner
+
+    choice Split : (TokenId, TokenId) 
+      with amountToSplit : Decimal
+      controller owner
+      do 
+        let amountToKeep = amount - amountToSplit
+        splitCid <- create this with amount = amountToSplit
+        toKeepCid <- create this with amount = amountToKeep
+        return (splitCid, toKeepCid)
+
+    choice Merge : TokenId
+      with tokenToMergeCid : TokenId
+      controller owner
+      do
+        tokenToMerge <- fetch tokenToMergeCid
+        assert (tokenToMerge.issuer == issuer && tokenToMerge.owner == owner && tokenToMerge.currency == currency)
+        archive tokenToMergeCid
+        create this with amount = amount + tokenToMerge.amount
+
+    choice Add_Obserever : ContractId Token 
+      with newObserver : Party
+      controller owner
+      do create this with auditors = newObserver :: auditors
+    
+    choice Remove_Obserever : ContractId Token 
+      with oldObserver : Party
+      controller owner
+      do create this with auditors = Prelude.filter (/= oldObserver) auditors

@@ -1,10 +1,10 @@
 module Test where
 
-import Main
+import Token
 
 import Daml.Script
 
-setup : Script AssetId
+setup : Script TokenId
 setup = script do
 -- user_setup_begin
   alice <- allocatePartyByHint (PartyIdHint "Alice")
@@ -19,7 +19,7 @@ setup = script do
 -- user_setup_end
 
   aliceTV <- submit issuer do
-    createCmd Asset with
+    createCmd Token with
       issuer = issuer
       owner = alice
       currency = "CapCan"
